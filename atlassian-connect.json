@@ -1,10 +1,10 @@
 {
   "key": "hipchat-dance-party-service",
-  "name": "hipchat-dance-party-service",
+  "name": "Dance Party Time!",
   "description": "My very first HipChat add-on",
   "vendor": {
-    "name": "Angry Nerds",
-    "url": "https://www.hipchat.com"
+    "name": "Sauce Labs",
+    "url": "https://www.saucelabs.com"
   },
   "links": {
     "self": "{{localBaseUrl}}/atlassian-connect.json",
@@ -14,7 +14,8 @@
     "hipchatApiConsumer": {
       "scopes": [
         "send_notification",
-        "view_room"
+        "view_room",
+        "view_group"
       ],
       "avatar": {
         "url": "{{localBaseUrl}}/img/logo.png",
@@ -27,67 +28,29 @@
     "configurable": {
       "url": "{{localBaseUrl}}/config"
     },
-    "webhook": {
-      "url": "{{localBaseUrl}}/webhook",
-      "pattern": "^/hello",
-      "event": "room_message",
-      "name": "Hello!",
-      "authentication": "jwt"
-    },
-    "glance": [
-      {
-        "name": {
-          "value": "Hello!"
-        },
-        "queryUrl": "{{localBaseUrl}}/glance",
-        "key": "sample.glance",
-        "target": "sample.sidebar",
-        "icon": {
-          "url": "{{localBaseUrl}}/img/logo.png",
-          "url@2x": "{{localBaseUrl}}/img/logo.png"
-        }
-      }
-    ],
-    "webPanel": [
-      {
-        "key": "sample.sidebar",
-        "name": {
-          "value": "Hello Sidebar!"
-        },
-        "location": "hipchat.sidebar.right",
-        "url": "{{localBaseUrl}}/sidebar"
-      }
-    ],
     "dialog": [
       {
-        "key": "sample.dialog",
-        "title": {
-          "value": "Hello Dialog!"
-        },
+        "key": "dialog.dance_party",
+        "title": { "value": "Start a Dance Party!" },
         "url": "{{localBaseUrl}}/dialog",
         "options": {
           "style": "normal",
           "primaryAction": {
-            "name": {
-              "value": "Say Hello!"
-            },
-            "key": "sample.dialog.action",
+            "name": { "value": "Start" },
+            "key": "dialog.dance_party.action",
             "enabled": true
           },
-          "size": {
-            "width": "400px",
-            "height": "200px"
-          }
+          "size": "large"
         }
       }
     ],
     "action": [
       {
-        "key": "sample.action",
+        "key": "action.start_dance_party",
         "name": {
-          "value": "Open Hello Dialog!"
+          "value": "Start Dance Party - ┏(-_-)┛┗(-_-)┓┗(-_-)┛┏(-_-)┓"
         },
-        "target": "sample.dialog",
+        "target": "dialog.dance_party",
         "location": "hipchat.input.action"
       }
     ]

@@ -1,12 +1,12 @@
-var http = require('request');
 var cors = require('cors');
 var uuid = require('uuid');
 var url = require('url');
+var router = require('express-promise-router')();
+var SongFinder = require("bpm2spotify").default;
 
-// This is the heart of your HipChat Connect add-on. For more information,
-// take a look at https://developer.atlassian.com/hipchat/tutorials/getting-started-with-atlassian-connect-express-node-js
 module.exports = function (app, addon) {
   var hipchat = require('../lib/hipchat')(addon);
+  app.use('/', router);
 
   // simple healthcheck
   app.get('/healthcheck', function (req, res) {
@@ -52,65 +52,6 @@ module.exports = function (app, addon) {
     }
     );
 
-  // This is an example glance that shows in the sidebar
-  // https://developer.atlassian.com/hipchat/guide/glances
-  app.get('/glance',
-    cors(),
-    addon.authenticate(),
-    function (req, res) {
-      res.json({
-        "label": {
-          "type": "html",
-          "value": "Hello World!"
-        },
-        "status": {
-          "type": "lozenge",
-          "value": {
-            "label": "NEW",
-            "type": "error"
-          }
-        }
-      });
-    }
-    );
-
-  // This is an example end-point that you can POST to to update the glance info
-  // Room update API: https://www.hipchat.com/docs/apiv2/method/room_addon_ui_update
-  // Group update API: https://www.hipchat.com/docs/apiv2/method/addon_ui_update
-  // User update API: https://www.hipchat.com/docs/apiv2/method/user_addon_ui_update
-  app.post('/update_glance',
-    cors(),
-    addon.authenticate(),
-    function (req, res) {
-      res.json({
-        "label": {
-          "type": "html",
-          "value": "Hello World!"
-        },
-        "status": {
-          "type": "lozenge",
-          "value": {
-            "label": "All good",
-            "type": "success"
-          }
-        }
-      });
-    }
-    );
-
-  // This is an example sidebar controller that can be launched when clicking on the glance.
-  // https://developer.atlassian.com/hipchat/guide/dialog-and-sidebar-views/sidebar
-  app.get('/sidebar',
-    addon.authenticate(),
-    function (req, res) {
-      res.render('sidebar', {
-        identity: req.identity
-      });
-    }
-    );
-
-  // This is an example dialog controller that can be launched when clicking on the glance.
-  // https://developer.atlassian.com/hipchat/guide/dialog-and-sidebar-views/dialog
   app.get('/dialog',
     addon.authenticate(),
     function (req, res) {
@@ -120,11 +61,7 @@ module.exports = function (app, addon) {
     }
     );
 
-  // Sample endpoint to send a card notification back into the chat room
-  // See https://developer.atlassian.com/hipchat/guide/sending-messages
-  app.post('/send_notification',
-    addon.authenticate(),
-    function (req, res) {
+  app.post('/start_party', addon.authenticate(), function (req, res) {
       var card = {
         "style": "link",
         "url": "https://www.hipchat.com",
@@ -142,17 +79,38 @@ module.exports = function (app, addon) {
     }
     );
 
-  // This is an example route to handle an incoming webhook
-  // https://developer.atlassian.com/hipchat/guide/webhooks
-  app.post('/webhook',
-    addon.authenticate(),
-    function (req, res) {
-      hipchat.sendMessage(req.clientInfo, req.identity.roomId, 'pong')
-        .then(function (data) {
-          res.sendStatus(200);
-        });
-    }
-    );
+
+  const getClientEmoticonsSettings = (clientKey) => {
+    return Promise.resolve({
+      "partyparrot": { bpm: 149 },
+      "nyancat": { bpm: 145 },
+      "wizard": { bpm: 106 },
+      "sharkdance": { bpm: 123 },
+      "mario": { bpm: 123 },
+      "megaman": { bpm: 150 },
+      "boom": { bpm: 111 },
+      "whynotboth": { bpm: 111 },
+      "disappear": { bpm: 111 } 
+    });
+  }
+
+  app.get('/emoticons', addon.authenticate(), function (req, res) {
+    return Promise.all([
+      hipchat.getEmoticons(req.clientInfo),
+      getClientEmoticonsSettings(req.clientInfo)
+    ]).then(values => {
+      const [allEmoticons, savedEmoticons] = values;
+      allEmoticons.body.items.forEach(emoji => {
+        if (savedEmoticons[emoji.shortcut]) {
+          emoji.bpm = savedEmoticons[emoji.shortcut].bpm;
+        }
+      });
+      return res.json(allEmoticons.body.items)
+    }).catch(err => {
+      console.trace('Error handling emoticons', err);
+      res.status(500).send(err);
+    });
+  });
 
   // Notify the room that the add-on was installed. To learn more about
   // Connect's install flow, check out:

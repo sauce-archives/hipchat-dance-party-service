@@ -1,0 +1,7 @@
+{
+  "extends": [ "semistandard", "eslint:recommended" ],
+  "env": {
+    "browser": true,
+    "es6": true
+  }
+}
