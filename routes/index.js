@@ -76,9 +76,7 @@ module.exports = function (app, addon) {
       var opts = { 'options': { 'color': 'yellow' } };
       hipchat.sendMessage(req.clientInfo, req.identity.roomId, msg, opts, card);
       res.json({ status: "ok" });
-    }
-    );
-
+    });
 
   const getClientEmoticonsSettings = (clientKey) => {
     return Promise.resolve({

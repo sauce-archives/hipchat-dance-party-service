@@ -24,9 +24,9 @@ $(document).ready(function() {
       var $container = $('#content');
       var $body = $('<dl>').attr('id', 'emoticonList');
       $.each(emoticons, function(idx, emoticon) {
-        console.log('emoticon', emoticon);
         var $item = $('<dd>');
         $item.addClass('emoticon');
+        $item.data('emoticon', emoticon);
         if (!emoticon.bpm) {
           $item.addClass('disabled');
         } else {
@@ -57,6 +57,7 @@ $(document).ready(function() {
         var emoticon = $('#content .selected').data('emoticon');
         if (!emoticon) {
           alert('Nothing selected');
+          return;
         }
 
         startParty(emoticon, function (error) {
