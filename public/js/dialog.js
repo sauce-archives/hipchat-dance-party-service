@@ -8,7 +8,8 @@ $(document).ready(function() {
         url: '/start_party',
         headers: {'Authorization': 'JWT ' + token},
         dataType: 'json',
-        data: { emoticon: emoticon },
+        contentType: 'application/json',
+        data: JSON.stringify({ emoticon: emoticon }),
         success: function () { callback(false); },
         error: function () { callback(true); }
       });

@@ -48,7 +48,7 @@
       {
         "key": "action.start_dance_party",
         "name": {
-          "value": "Start Dance Party - ┏(-_-)┛┗(-_-)┓┗(-_-)┛┏(-_-)┓"
+          "value": "Dance Party - ┏(-_-)┛┗(-_-)┓┗(-_-)┛"
         },
         "target": "dialog.dance_party",
         "location": "hipchat.input.action"
