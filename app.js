@@ -20,6 +20,7 @@ var hbs = require('express-hbs');
 var http = require('http');
 var path = require('path');
 var os = require('os');
+var rollbar = require('rollbar');
 
 // Let's use Redis to store our data
 ac.store.register('redis', require('atlassian-connect-express-redis'));
@@ -92,6 +93,9 @@ if (devEnv) app.use(errorHandler());
 
 // Wire up your routes using the express and `atlassian-connect-express` objects
 routes(app, addon);
+
+// Use the rollbar error handler to send exceptions to your rollbar account
+app.use(rollbar.errorHandler('b2f97ae0fcce4b6e90409140985e80c8'));
 
 // Boot the damn thing
 http.createServer(app).listen(port, function(){

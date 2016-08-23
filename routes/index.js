@@ -42,50 +42,87 @@ module.exports = function (app, addon) {
     });
   });
 
+  function sendEmoticon(clientInfo, identity, emoticon) {
+    return hipchat.sendMessage(
+      clientInfo,
+      identity.roomId,
+      `(${emoticon.shortcut})`.repeat(DANCE_LINE_LENGTH),
+      { message_format: 'text' }
+    ).then(response => {
+      const messageId = response.headers.location.split('/').pop();
+      return messageId;
+    });
+  }
+
+  function sendTrack(clientInfo, identity, messageId, track) {
+    const message = `<a href="${track.external_urls.spotify}">${track.artists[0].name} - ${track.album.name} - ${track.name}</a>`;
+    var card = {
+      style: 'application',
+      url: track.preview_url + '?filename=preview.mp3',
+      id: uuid.v4(),
+      title: track.name,
+      description: {
+        format: 'html',
+        value: message
+      },
+      format: 'medium',
+      thumbnail: track.album.images[0],
+      attributes: [
+        {
+          label: 'link',
+          value: {
+            url: track.external_urls.spotify,
+            label: 'spotify',
+            icon: {
+              url: "http://icons.iconarchive.com/icons/google/chrome/32/Google-Chrome-icon.png"
+            }
+          },
+        },
+        {
+          label: 'link',
+          value: {
+            url: track.preview_url + '?filename=preview.mp3',
+            label: 'mp3',
+            icon: {
+              url: "http://icons.iconarchive.com/icons/iconsmind/outline/32/Mp3-File-icon.png"
+            }
+          },
+        }
+      ]
+      //icon: { 'url': emoticon.url },
+    };
+    return hipchat.sendMessage(
+      clientInfo,
+      identity.roomId,
+      message,
+      { message_format: 'html', attach_to: messageId, card: card }
+    ).then(response => {
+      const messageId = response.headers.location.split('/').pop();
+      return messageId;
+    });
+  }
   app.post('/start_party', addon.authenticate(), function (req, res) {
     const emoticon = req.body.emoticon;
     return songfinder.getRandomSong(123)
-      .then(song => {
-        const trackId = song.spotifyUrl.split('/').pop();
-        return spotifyApi.getTrack(trackId)
-        .then(track => {
-          track = track.body;
-          const message = `<a href="${song.spotifyUrl}">${track.artists[0].name} - ${track.album.name} - ${track.name}</a>`;
-          var card = {
-            /*
-            style: 'link',
-            url: song.spotifyUrl,
-            */
-            style: 'media',
-            url: track.preview_url + '?filename=preview.mp3',
-            id: uuid.v4(),
-            title: track.name,
-            description: {
-              format: 'html',
-              value: message
-            },
-            icon: { 'url': emoticon.url },
-            /*attributes: [
-              { label: 'Preview', url: track.preview_url, value: { label: 'Preview' } }
-            ]*/
-          };
-          const opts = { options: { color: 'random', format: 'html' } };
-          return hipchat.sendMessage(
-            req.clientInfo,
-            req.identity.roomId,
-            `(${emoticon.shortcut}) ${message}`,
-            opts,
-            card
-          );
+    .then(song => {
+      const trackId = song.spotifyUrl.split('/').pop();
+      return spotifyApi.getTrack(trackId)
+      .then(track => track.body)
+      .then(track => {
+        sendEmoticon(req.clientInfo, req.identity, emoticon)
+        .then(messageId => {
+          setTimeout(() => sendTrack(req.clientInfo, req.identity, messageId, track), 1000);
+          setTimeout(() => sendEmoticon(req.clientInfo, req.identity, emoticon), 3000);
         });
-      })
-      .then(() => res.json({ status: "ok" }))
-      .catch(err => {
-        console.log('err', err);
-        const msg = `Oops. Something crashed, couldn't dance /o\ \n Error was: ${err.message || err}`
-        hipchat.sendMessage(req.clientInfo, req.identity.roomId, msg);
-        res.status(500).send({ status: "error", message: msg });
       });
+    })
+    .then(() => res.json({ status: "ok" }))
+    .catch(err => {
+      console.log('err', err);
+      const msg = `Oops. Something crashed, couldn't dance /o\ \n Error was: ${err.message || err}`
+      hipchat.sendMessage(req.clientInfo, req.identity.roomId, msg);
+      res.status(500).send({ status: "error", message: msg });
+    });
   });
 
   const getClientEmoticonsSettings = (/*clientKey*/) => {
