@@ -126,15 +126,21 @@ module.exports = function (app, addon) {
   const getClientEmoticonsSettings = (clientInfo) => {
     return addon.settings.get('emoticons', clientInfo.clientKey).then(emoticons => {
       return Object.assign({
+        /* From Sauce Slack */
         'partyparrot': { bpm: 149 },
         'nyancat': { bpm: 145 },
         'wizard': { bpm: 106 },
         'sharkdance': { bpm: 123 },
         'mario': { bpm: 123 },
         'megaman': { bpm: 150 },
+
+        /* Test Results (For now) */
         'boom': { bpm: 111 },
         'whynotboth': { bpm: 111 },
-        'disappear': { bpm: 111 }
+        'disappear': { bpm: 111 },
+
+        /* Offical Results */
+        'gangnamstyle': { bpm: 120 }
       }, emoticons || {});
     });
   }
