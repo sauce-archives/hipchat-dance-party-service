@@ -42,19 +42,19 @@ module.exports = function (app, addon) {
     });
   });
 
-  function sendEmoticon(clientInfo, identity, emoticon) {
+  function sendEmoticon(clientInfo, identity, from, emoticon) {
     return hipchat.sendMessage(
       clientInfo,
       identity.roomId,
       `(${emoticon.shortcut})`.repeat(DANCE_LINE_LENGTH),
-      { message_format: 'text' }
+      { message_format: 'text', from: from }
     ).then(response => {
       const messageId = response.headers.location.split('/').pop();
       return messageId;
     });
   }
 
-  function sendTrack(clientInfo, identity, messageId, track) {
+  function sendTrack(clientInfo, identity, from, messageId, track) {
     const message = `<a href="${track.external_urls.spotify}">${track.artists[0].name} - ${track.album.name} - ${track.name}</a>`;
     var card = {
       style: 'application',
@@ -95,7 +95,7 @@ module.exports = function (app, addon) {
       clientInfo,
       identity.roomId,
       message,
-      { message_format: 'html', attach_to: messageId, card: card }
+      { message_format: 'html', attach_to: messageId, card: card, from: from }
     ).then(response => {
       const messageId = response.headers.location.split('/').pop();
       return messageId;
@@ -103,16 +103,18 @@ module.exports = function (app, addon) {
   }
   app.post('/start_party', addon.authenticate(), function (req, res) {
     const emoticon = req.body.emoticon;
+    const from = req.body.from;
+
     return songfinder.getRandomSong(123)
     .then(song => {
       const trackId = song.spotifyUrl.split('/').pop();
       return spotifyApi.getTrack(trackId)
       .then(track => track.body)
       .then(track => {
-        sendEmoticon(req.clientInfo, req.identity, emoticon)
+        sendEmoticon(req.clientInfo, req.identity, from, emoticon)
         .then(messageId => {
-          setTimeout(() => sendTrack(req.clientInfo, req.identity, messageId, track), 1000);
-          setTimeout(() => sendEmoticon(req.clientInfo, req.identity, emoticon), 3000);
+          setTimeout(() => sendTrack(req.clientInfo, req.identity, from, messageId, track), 50);
+          setTimeout(() => sendEmoticon(req.clientInfo, req.identity, from, emoticon), 100);
         });
       });
     })

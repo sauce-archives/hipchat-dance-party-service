@@ -6,6 +6,8 @@ const ReactDOM = require('react-dom');
 const promisify = require('es6-promisify-all');
 const classNames = require('classnames');
 
+import {throttle} from 'lodash';
+
 var Rollbar = require('./rollbar.umd.nojson.min.js').init({
   accessToken: "13c076da4f88476f97047befd32696ca",
   captureUncaught: true,
@@ -17,7 +19,12 @@ require('es6-promise').polyfill();
 require('isomorphic-fetch');
 
 if (!window.HipChat) { window.HipChat = { auth: { withToken: () => {} }, register: () => {} }; }
-HipChat.auth = promisify(HipChat.auth);
+if (HipChat.auth) {
+  HipChat.auth = promisify(HipChat.auth);
+}
+if (HipChat.user) {
+  HipChat.user = promisify(HipChat.user);
+}
 
 class PartyDialog extends React.Component {
   constructor() {
@@ -25,39 +32,45 @@ class PartyDialog extends React.Component {
     this.state = {};
     this.startParty = this.startParty.bind(this);
     this.onClickEmoticon = this.onClickEmoticon.bind(this);
+    this.onDialogClickAction = throttle(this.onDialogClickAction.bind(this), 1000);
   }
 
   startParty(emoticon) {
-    return HipChat.auth.withTokenAsync().then(token => {
-      return fetch('/start_party', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': 'JWT ' + token
-        },
-        body: JSON.stringify({ emoticon: emoticon }),
-      }).then(response => response.json());
+    return HipChat.user.getCurrentUserAsync().then(user => {
+      return HipChat.auth.withTokenAsync().then(token => {
+        return fetch('/start_party', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'JWT ' + token
+          },
+          body: JSON.stringify({ emoticon: emoticon, from: user.name }),
+        }).then(response => response.json());
+      });
     });
+  }
+
+  onDialogClickAction(closeDialog) {
+    const emoticon = this.state.emoticons.find(e => e.selected);
+    if (!emoticon) {
+      alert('Nothing selected');
+      return;
+    }
+
+    this.startParty(emoticon)
+    .then(() => closeDialog(true))
+    .catch(e => {
+      alert('Error starting party')
+      Rollbar.error("Error starting party", e);
+    })
   }
 
   componentDidMount() {
     HipChat.register({
       "dialog-button-click": (event, closeDialog) => {
-        console.log('event', event);
         if (event.action === "dialog.dance_party.action") {
-          const emoticon = this.state.emoticons.find(e => e.selected);
-          if (!emoticon) {
-            alert('Nothing selected');
-            return;
-          }
-
-          this.startParty(emoticon)
-            .then(() => closeDialog(true))
-            .catch(e => {
-              alert('Error starting party')
-              Rollbar.error("Error starting party", e);
-            })
+          this.onDialogClickAction(closeDialog);
         } else {
           closeDialog(true);
         }
