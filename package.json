@@ -61,6 +61,7 @@
     "postcss-loader": "^0.10.1",
     "react": "^15.3.0",
     "react-dom": "^15.3.0",
+    "redux": "^3.5.2",
     "sass": "^0.5.0",
     "sass-loader": "^4.0.0",
     "style-loader": "^0.13.1",

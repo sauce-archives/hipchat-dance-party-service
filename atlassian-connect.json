@@ -1,7 +1,7 @@
 {
   "key": "hipchat-dance-party-service",
   "name": "Dance Party Time!",
-  "description": "My very first HipChat add-on",
+  "description": "Everyone needs a dance party once in a while",
   "vendor": {
     "name": "Sauce Labs",
     "url": "https://www.saucelabs.com"
@@ -24,9 +24,6 @@
     },
     "installable": {
       "callbackUrl": "{{localBaseUrl}}/installable"
-    },
-    "configurable": {
-      "url": "{{localBaseUrl}}/config"
     },
     "dialog": [
       {

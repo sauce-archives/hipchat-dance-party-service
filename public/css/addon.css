@@ -1,20 +1,32 @@
 /* add-on styles */
+#emoticonList {
+  list-type: none;
+}
+.emoticon {
+  display: inline-block;
+  border: 1px solid white;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  width: 100px;
+  height: 70px;
+  text-align: center;
+  margin: 5px;
+  padding: 10px;
+  float: left;
+}
+.emoticon img {
+  height: 36px;
+  width: 36px;
+}
 
-/* Styles for the sidebar to support the single page content approach. */
-.content-target {
-  display: none;
-  position: absolute;
-  top: 0;
+.emoticon.selected {
+  border: 3px solid green;
+  background-color: lightgrey;
 }
-.aui-connect-content,
-:target ~ .aui-connect-content,
-:target ~ .aui-connect-content:last-child {
-  display: none;
-}
-:target + .aui-connect-content,
-:target + .aui-connect-content:last-child {
-  display: block;
-}
-.aui-connect-content:last-child {
-  display: block;
+.hide-disabled .disabled { display: none; }
+.emoticon.disabled {
+  background-color: lightgrey;
+  cursor: not-allowed;
+  pointer-events:none; //This makes it not clickable
+  opacity:0.6;         //This grays it out to look disabled
 }

@@ -32,10 +32,6 @@ module.exports = function (app, addon) {
     }
   });
 
-  app.get('/config', addon.authenticate(), function (req, res) {
-      res.render('config', req.context);
-  });
-
   app.get('/dialog', addon.authenticate(), function (req, res) {
     res.render('dialog', {
       identity: req.identity
@@ -74,7 +70,7 @@ module.exports = function (app, addon) {
             url: track.external_urls.spotify,
             label: 'spotify',
             icon: {
-              url: "http://icons.iconarchive.com/icons/google/chrome/32/Google-Chrome-icon.png"
+              url: `${addon.config.localBaseUrl()}/img/Google-Chrome-icon.png`
             }
           },
         },
@@ -84,7 +80,7 @@ module.exports = function (app, addon) {
             url: track.preview_url + '?filename=preview.mp3',
             label: 'mp3',
             icon: {
-              url: "http://icons.iconarchive.com/icons/iconsmind/outline/32/Mp3-File-icon.png"
+              url: `${addon.config.localBaseUrl()}/img/Mp3-File-icon.png`
             }
           },
         }
@@ -127,17 +123,19 @@ module.exports = function (app, addon) {
     });
   });
 
-  const getClientEmoticonsSettings = (/*clientKey*/) => {
-    return Promise.resolve({
-      'partyparrot': { bpm: 149 },
-      'nyancat': { bpm: 145 },
-      'wizard': { bpm: 106 },
-      'sharkdance': { bpm: 123 },
-      'mario': { bpm: 123 },
-      'megaman': { bpm: 150 },
-      'boom': { bpm: 111 },
-      'whynotboth': { bpm: 111 },
-      'disappear': { bpm: 111 }
+  const getClientEmoticonsSettings = (clientInfo) => {
+    return addon.settings.get('emoticons', clientInfo.clientKey).then(emoticons => {
+      return Object.assign({
+        'partyparrot': { bpm: 149 },
+        'nyancat': { bpm: 145 },
+        'wizard': { bpm: 106 },
+        'sharkdance': { bpm: 123 },
+        'mario': { bpm: 123 },
+        'megaman': { bpm: 150 },
+        'boom': { bpm: 111 },
+        'whynotboth': { bpm: 111 },
+        'disappear': { bpm: 111 }
+      }, emoticons || {});
     });
   }
 
@@ -157,6 +155,15 @@ module.exports = function (app, addon) {
       console.trace('Error handling emoticons', err);
       res.status(500).send(err);
     });
+  });
+
+  app.post('/emoticons', addon.authenticate(), function (req, res) {
+    const emoticons = req.body.emoticons.filter(e=>e.bpm).reduce((emoticons, e) => {
+      emoticons[e.shortcut] = { bpm: e.bpm };
+      return emoticons;
+    }, {});
+    return addon.settings.set('emoticons', emoticons, req.clientInfo.clientKey)
+      .then(() => res.json({}));
   });
 
   // Notify the room that the add-on was installed. To learn more about
