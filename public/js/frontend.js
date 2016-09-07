@@ -6,7 +6,7 @@ const ReactDOM = require('react-dom');
 const promisify = require('es6-promisify-all');
 const classNames = require('classnames');
 
-import {throttle} from 'lodash';
+import {throttle, assign} from 'lodash';
 import {createStore} from 'redux';
 
 var Rollbar = require('./rollbar.umd.nojson.min.js').init({
@@ -36,7 +36,7 @@ function emoticons(state = [], action) {
     case 'BPMIFY':
       return state.map(emoticon => {
         if (action.id === emoticon.id) {
-          return Object.assign({}, emoticon, { bpm: action.bpm });
+          return assign({}, emoticon, { bpm: action.bpm });
         }
         return emoticon;
       });
