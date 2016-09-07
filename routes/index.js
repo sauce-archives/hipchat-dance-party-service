@@ -16,11 +16,7 @@ module.exports = function (app, addon) {
 
   // simple healthcheck
   app.get('/healthcheck', function (req, res) {
-    res.send('OK');
-  });
-
-  app.get('/gavin', function(req, res) {
-    res.render('dialog');
+    res.json({ status: 'OK', version: require('../package.json').version });
   });
 
   app.get('/', function (req, res) {
