@@ -14,7 +14,7 @@
   "dependencies": {
     "atlassian-connect-express": "^1.0.10",
     "atlassian-connect-express-hipchat": "^0.3.5",
-    "atlassian-connect-express-redis": "^0.1.6",
+    "atlassian-connect-express-redis": "^0.1.8",
     "body-parser": "^1.15.2",
     "bpm2spotify": "0.0.7",
     "compression": "^1.6.2",
