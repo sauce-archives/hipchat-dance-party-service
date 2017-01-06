@@ -24,6 +24,7 @@ var rollbar = require('rollbar');
 
 // Let's use Redis to store our data
 ac.store.register('redis', require('atlassian-connect-express-redis'));
+ac.store.register('cloud_sql', require('./lib/store.js'));
 
 // Anything in ./public is served up as static content
 var staticDir = path.join(__dirname, 'public');
@@ -34,7 +35,7 @@ var routes = require('./routes');
 // Bootstrap Express
 var app = express();
 // Bootstrap the `atlassian-connect-express` library
-var addon = ac(app);
+var addon = ac(app, {}, console);
 // You can set this in `config.js`
 var port = addon.config.port();
 // Declares the environment to use in `config.js`

@@ -2,6 +2,7 @@ const fs = require('fs');
 const ac = require('atlassian-connect-express');
 const express = require('express');
 ac.store.register('redis', require('atlassian-connect-express-redis'));
+ac.store.register('cloud_sql', require('../lib/store.js'));
 
 const app = express();
 app.set('env', 'production');

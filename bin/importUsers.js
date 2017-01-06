@@ -2,10 +2,10 @@ const fs = require('fs');
 const ac = require('atlassian-connect-express');
 const express = require('express');
 ac.store.register('redis', require('atlassian-connect-express-redis'));
-ac.store.register('cloud_sql', require('./lib/store.js'));
+ac.store.register('cloud_sql', require('../lib/store.js'));
 
 const app = express();
-app.set('env', 'production');
+app.set('env', process.env.NODE_ENV || 'development');
 const addon = ac(app);
 addon._configure = function() { };
 
@@ -15,4 +15,6 @@ Promise.all(users.map(function(user) {
     addon.settings.set('clientInfo', user.clientInfo, user.clientInfo.clientKey),
     addon.settings.set('emoticons', user.emoticons, user.clientInfo.clientKey)
   ]);
-})).then(() => process.exit(1));
+}))
+  .catch(console.error)
+  .then(() => process.exit(1));
