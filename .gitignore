@@ -5,3 +5,4 @@ node_modules
 .vscode
 dump.rdb
 store.db
+users*.json
