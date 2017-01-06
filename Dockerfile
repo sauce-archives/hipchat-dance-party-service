@@ -1,4 +1,4 @@
-FROM node:6.4.0
+FROM node:6.6.0
 MAINTAINER Gavin Mogan <gavin@saucelabs.com>
 EXPOSE 3000
 ENV NODE_ENV=production
