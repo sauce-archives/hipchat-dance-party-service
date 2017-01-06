@@ -35,7 +35,7 @@ var routes = require('./routes');
 // Bootstrap Express
 var app = express();
 // Bootstrap the `atlassian-connect-express` library
-var addon = ac(app, {}, console);
+var addon = ac(app);
 // You can set this in `config.js`
 var port = addon.config.port();
 // Declares the environment to use in `config.js`
