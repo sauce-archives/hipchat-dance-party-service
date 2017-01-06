@@ -16,7 +16,11 @@ module.exports = function (app, addon) {
 
   // simple healthcheck
   app.get('/healthcheck', function (req, res) {
-    res.json({ status: 'OK', version: require('../package.json').version });
+    res.json({
+      status: 'OK',
+      version: require('../package.json').version,
+      name: require('../package.json').name
+    });
   });
 
   app.get('/', function (req, res) {
