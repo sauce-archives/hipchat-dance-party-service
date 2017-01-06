@@ -15,7 +15,7 @@
     "dev": "nodemon -w app.js -w atlassian-connect.json -w config.json -w routes/index.js app.js",
     "start": "node app.js",
     "test": "true",
-    "postversion": "conventional-github-releaser -p angular"
+    "postversion": "git push --tags && conventional-github-releaser -p angular"
   },
   "author": "Gavin Mogan <npm@gavinmogan.com> (https://www.gavinmogan.com/)",
   "dependencies": {
