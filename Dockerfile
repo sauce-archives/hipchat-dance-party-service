@@ -15,6 +15,7 @@ RUN mkdir -p /usr/src/app && cp -a /tmp/node_modules /usr/src/app
 
 WORKDIR /usr/src/app
 COPY .babelrc .eslintrc *.js atlassian-connect.json config.json package.json /usr/src/app/
+COPY bin/ /usr/src/app/bin/
 COPY lib/ /usr/src/app/lib/
 COPY public/ /usr/src/app/public/
 COPY routes/ /usr/src/app/routes/
