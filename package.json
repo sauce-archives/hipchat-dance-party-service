@@ -17,7 +17,7 @@
     "test": "true",
     "postversion": "git push --tags && conventional-github-releaser -p angular"
   },
-  "author": "Gavin Mogan <npm@gavinmogan.com> (https://www.gavinmogan.com/)",
+  "author": "Gavin Mogan <gavin@saucelabs.com> (https://www.saucelabs.com/)",
   "dependencies": {
     "atlassian-connect-express": "^2.0.0",
     "atlassian-connect-express-hipchat": "^0.3.8",
