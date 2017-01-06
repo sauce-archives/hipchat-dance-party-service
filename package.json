@@ -14,7 +14,7 @@
     "heroku-postbuild": "./bin/build.sh",
     "dev": "nodemon -w app.js -w atlassian-connect.json -w config.json -w routes/index.js app.js",
     "start": "node app.js",
-    "test": "TZ=GMT NODE_ENV=test mocha"
+    "test": "true"
   },
   "dependencies": {
     "atlassian-connect-express": "^2.0.0",
